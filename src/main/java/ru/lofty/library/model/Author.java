@@ -1,9 +1,11 @@
 package ru.lofty.library.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -14,7 +16,8 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "authors")
-public class Author {
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+public class Author implements Serializable {
 
     @Id
     @SequenceGenerator(name = "authorsIdSeq", sequenceName = "authors_id_seq", allocationSize = 1)
