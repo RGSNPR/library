@@ -1,11 +1,13 @@
 package ru.lofty.library.dao;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.lofty.library.model.Book;
 import ru.lofty.library.repository.BookRepository;
-
-import java.util.List;
 
 /**
  * @author Alex Lavrentyev
@@ -26,8 +28,16 @@ public class BookDao {
         return true;
     }
 
-    public List<Book> readAll() {
-        return bookRepository.findAll();
+    public Page<Book> readAll(int pageNumber, String sortField, String sortDir) {
+
+        int pageSize = 3;
+
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize,
+                sortDir.equals("asc") ? Sort.by(sortField).ascending()
+                        : Sort.by(sortField).descending()
+        );
+
+        return bookRepository.findAll(pageable);
     }
 
     public Book read(Long id) {

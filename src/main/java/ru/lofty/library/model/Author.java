@@ -12,8 +12,6 @@ import java.util.List;
  * @author Alex Lavrentyev
  */
 
-@Getter
-@Setter
 @Entity
 @Table(name = "authors")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
@@ -29,4 +27,36 @@ public class Author implements Serializable {
 
     @OneToMany(mappedBy = "author")
     private List<Book> booksWritten;
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public List<Book> getBooksWritten() {
+        return booksWritten;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public void setBooksWritten(List<Book> booksWritten) {
+        this.booksWritten = booksWritten;
+    }
 }

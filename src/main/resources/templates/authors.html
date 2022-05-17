@@ -1,17 +1,68 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Books</title>
+    <title>Authors</title>
 </head>
 <body>
+<div align="center">
+    <h1>Authors Table</h1>
+    <table border="1" cellpadding="10">
+        <thead>
+        <tr>
+            <th>
+                <a th:href="@{'/authors/page/' + ${currentPage} + '?sortField=id&sortDir=' + ${reverseSortDir}}">Author ID</a>
+            </th>
+            <th>
+                <a th:href="@{'/authors/page/' + ${currentPage} + '?sortField=firstName&sortDir=' + ${reverseSortDir}}">First Name</a>
+            </th>
+            <th>
+                <a th:href="@{'/authors/page/' + ${currentPage} + '?sortField=lastName&sortDir=' + ${reverseSortDir}}">Last Name</a>
+            </th>
+            <th>Personal Links</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="author : ${authors}" th:method="GET">
+            <td th:text="${author.id}">Author ID</td>
+            <td th:text="${author.firstName}">First Name</td>
+            <td th:text="${author.lastName}">Last Name</td>
+            <td>
+                <a th:href="@{/authors/{id}(id=${author.id})}">Watch Author</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div>&nbsp;</div>
+    <div>&nbsp;</div>
+    <div th:if="${totalPages > 1}">
+        Total Amount of Authors: [[${totalItems}]]
+        &nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;
 
-<div th:each="author : ${authors}">
-    <a th:href="@{/authors/{id}(id=${author.getId()})}" th:text="
-    ${author.getFirstName()} + ${author.getLastName()}">
-        author
-    </a>
+        <a th:if="${currentPage > 1}" th:href="@{'/authors/page/1' + '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir}}">First</a>
+        <span th:unless="${currentPage > 1}">First</span>
+        &nbsp;&nbsp;
+
+        <a th:if="${currentPage > 1}" th:href="@{'/authors/page/' + ${currentPage - 1} + '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir}}">Previous</a>
+        <span th:unless="${currentPage > 1}">Previous</span>
+
+        &nbsp;&nbsp;
+
+        <span th:each="i: ${#numbers.sequence(1, totalPages)}">
+			<a th:if="${currentPage != i}" th:href="@{'/authors/page/' + ${i} + '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir}}">[[${i}]]</a>
+			<span th:unless="${currentPage != i}">[[${i}]]</span>
+			&nbsp;
+		</span>
+
+        <a th:if="${currentPage < totalPages}" th:href="@{'/authors/page/' + ${currentPage + 1} + '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir}}">Next</a>
+        <span th:unless="${currentPage < totalPages}">Next</span>
+        &nbsp;&nbsp;
+
+        <a th:if="${currentPage < totalPages}" th:href="@{'/authors/page/' + ${totalPages} + '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir}}">Last</a>
+        <span th:unless="${currentPage < totalPages}">Last</span>
+    </div>
 </div>
-
+<a href="/books">Show all books</a>
+<a href="/users">Show all users</a>
 </body>
 </html>
