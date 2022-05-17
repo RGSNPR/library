@@ -25,6 +25,7 @@ public class Author implements Serializable {
     private String firstName;
     private String lastName;
 
+    // спорная реализация, описано в Book
     @OneToMany(mappedBy = "author")
     private List<Book> booksWritten;
 

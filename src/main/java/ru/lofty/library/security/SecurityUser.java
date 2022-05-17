@@ -11,6 +11,7 @@ import java.util.List;
 /**
  * @author Alex Lavrentyev
  */
+// в такой реализации лучше наследоваться от org.springframework.security.core.userdetails.User чтобы не дублировать
 public class SecurityUser implements UserDetails {
 
     private final String username;

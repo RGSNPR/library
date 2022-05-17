@@ -11,7 +11,7 @@ import ru.lofty.library.repository.UserRepository;
 /**
  * @author Alex Lavrentyev
  */
-
+// А где сама конфигурация?
 @Service("userDetailsServiceImpl")
 public class UserDetailsServiceImpl implements UserDetailsService {
 
