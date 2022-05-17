@@ -23,6 +23,8 @@ public class Book implements Serializable {
     private String name;
     private int publicationYear;
 
+    // Так автора добавить никогда не получится, т.к. стоит read-only, это первое
+    // логичнее, что у книги могут быть несколько авторов
     @ManyToOne
     @JoinColumn(name = "author_id", insertable = false, updatable = false)
     @NotFound(action = NotFoundAction.IGNORE)

@@ -2,6 +2,7 @@ package ru.lofty.library.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,12 +14,15 @@ import ru.lofty.library.dao.AuthorDao;
 import ru.lofty.library.model.Author;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author Alex Lavrentyev
  */
 
-@Controller
+// Лучше обернуть в AuthorDTO чтобы не отдавать с persistence объект.
+@RestController
 @RequestMapping("/authors")
 public class AuthorController {
     private final AuthorDao authorDao;
@@ -28,68 +32,69 @@ public class AuthorController {
         this.authorDao = authorDao;
     }
 
-    @PostMapping
+    @PostMapping("/create")
     @PreAuthorize("hasAuthority('authors:post')")
-    public ResponseEntity<?> create(@RequestBody Author author) {
-        final boolean created = authorDao.create(author);
-
-        return created ? new ResponseEntity<>(HttpStatus.OK) :
-                new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
+    public ResponseEntity<Author> create(@RequestBody Author author) {
+        return Optional.ofNullable(author)
+                .filter(f -> Objects.isNull(f.getId()))
+                .map(authorDao::create)
+                .map(p -> new ResponseEntity<>(p, HttpStatus.OK))
+                // Дополнительно можно сделать ControllerAdvice для обработки ошибок
+//                .orElseThrow(() -> new IllegalArgumentException("Author might be not null and ID might be null"));
+                .orElseGet(() -> ResponseEntity.badRequest().build());
     }
 
+    /**
+     * В параметрах запроса можно указывать page=&size=&sort=field,direction
+     * field это имя поля
+     * direction asc:desc - не обязательное, по умолчанию asc
+     * @param pageable org.springframework.data.domain.Pageable
+     * @return Page
+     */
     @GetMapping
     @PreAuthorize("hasAuthority('authors:get')")
-    public String readAll(Model model) {
-
-        return viewPage(model, 1, "lastName", "asc");
-    }
-
-    @GetMapping("/page/{pageNumber}")
-    @PreAuthorize("hasAuthority('authors:get')")
-    public String viewPage(Model model,
-                           @PathVariable(name = "pageNumber") int pageNumber,
-                           @Param("sortField") String sortField,
-                           @Param("sortDir") String sortDir) {
-
-        Page<Author> page = authorDao.readAll(pageNumber, sortField, sortDir);
-
-        List<Author> authors = page.getContent();
-
-        model.addAttribute("currentPage", pageNumber);
-        model.addAttribute("totalPages", page.getTotalPages());
-        model.addAttribute("totalItems", page.getTotalElements());
-        model.addAttribute("sortField", sortField);
-        model.addAttribute("sortDir", sortDir);
-        model.addAttribute("reverseSortDir", sortDir.equals("asc") ? "desc" : "asc");
-
-        model.addAttribute("authors", authors);
-
-        return "authors";
+    public Page<Author> list(Pageable pageable) {
+        // можно использовать для сравнения заготовленный массив, если видов сортировки несколько, как у книг.
+        if (pageable.getSort().stream().allMatch(f -> Objects.equals("lastName", f.getProperty())) ||
+                pageable.getSort().isEmpty() || pageable.isUnpaged()) {
+            // можно так же проверять страницу, если хочется чтобы шло с 1, а не 0
+            // при этом можно оборачивать результат в новый Page -> PageImpl<>
+            return authorDao.findAll(pageable);
+        } else {
+            // Дополнительно можно сделать ControllerAdvice для обработки ошибок
+            throw new RuntimeException();
+        }
     }
 
     @GetMapping(value = "/{id}")
     @PreAuthorize("hasAuthority('authors:get')")
-    public String read(@PathVariable(name = "id") Long id, Model model) {
-        model.addAttribute("author", authorDao.read(id));
-
-        return "author";
+    public ResponseEntity<Author> read(@PathVariable(name = "id") Long id, Model model) {
+        return authorDao.read(id)
+                .map(p -> new ResponseEntity<>(p, HttpStatus.OK))
+                .orElseGet(() -> ResponseEntity.badRequest().build());
     }
 
-    @PutMapping(value = "/{id}")
-    @PreAuthorize("hasAuthority('authors:post')")
-    public ResponseEntity<?> update(@PathVariable(name = "id") Long id, @RequestBody Author author) {
-        final boolean updated =  authorDao.update(author, id);
-
-        return updated ? new ResponseEntity<>(HttpStatus.OK) :
-                new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
+    @PutMapping("/update")
+    @PreAuthorize("hasAuthority('authors:get')")
+    public ResponseEntity<Author> update(@RequestBody Author author) {
+        // нет большого смысла передавать id, если пробрасывать готовый объект
+        return authorDao.update(author)
+                .map(p -> new ResponseEntity<>(author, HttpStatus.OK))
+                // Дополнительно можно сделать ControllerAdvice для обработки ошибок
+//                .orElseThrow(IllegalArgumentException::new);
+                .orElseGet(() -> ResponseEntity.badRequest().build());
     }
 
     @DeleteMapping(value = "/{id}")
     @PreAuthorize("hasAuthority('authors:post')")
     public ResponseEntity<?> delete(@PathVariable(name = "id") Long id) {
+        // опять же лучше уже выкинуть свою ошибку, чтобы не гадать, "а что случилось?"
         final boolean deleted = authorDao.delete(id);
 
         return deleted ? new ResponseEntity<>(HttpStatus.OK) :
                 new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
     }
+
+    // так же можно подумать насчет редактирование авторов у книги или тут, или в BookController
+    // так как текущей реализации нет
 }
