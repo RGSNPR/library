@@ -1,10 +1,5 @@
 package ru.lofty.library.model;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-
 import javax.persistence.*;
 
 /**
@@ -28,6 +23,8 @@ public class User {
     @Enumerated(value = EnumType.STRING)
     private Status status;
 
+    public Long getId() { return id; }
+
     public String getUsername() {
         return username;
     }
@@ -42,6 +39,10 @@ public class User {
 
     public Status getStatus() {
         return status;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public void setUsername(String username) {

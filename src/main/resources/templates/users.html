@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Users</title>
+</head>
+<body>
+<div align="center">
+    <h1>Users Table</h1>
+    <table border="1" cellpadding="10">
+        <thead>
+        <tr>
+            <th>
+                <a th:href="@{'/users/page/' + ${currentPage} + '?sortField=id&sortDir=' + ${reverseSortDir}}">User ID</a>
+            </th>
+            <th>
+                <a th:href="@{'/users/page/' + ${currentPage} + '?sortField=username&sortDir=' + ${reverseSortDir}}">Username</a>
+            </th>
+            <th>
+                <a th:href="@{'/users/page/' + ${currentPage} + '?sortField=role&sortDir=' + ${reverseSortDir}}">Role</a>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="user : ${users}" th:method="GET">
+            <td th:text="${user.id}">Author ID</td>
+            <td th:text="${user.username}">First Name</td>
+            <td th:text="${user.role}">Role</td>
+        </tr>
+        </tbody>
+    </table>
+    <div>&nbsp;</div>
+    <div>&nbsp;</div>
+    <div th:if="${totalPages > 1}">
+        Total Amount of Users: [[${totalItems}]]
+        &nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;
+
+        <a th:if="${currentPage > 1}" th:href="@{'/users/page/1' + '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir}}">First</a>
+        <span th:unless="${currentPage > 1}">First</span>
+        &nbsp;&nbsp;
+
+        <a th:if="${currentPage > 1}" th:href="@{'/users/page/' + ${currentPage - 1} + '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir}}">Previous</a>
+        <span th:unless="${currentPage > 1}">Previous</span>
+
+        &nbsp;&nbsp;
+
+        <span th:each="i: ${#numbers.sequence(1, totalPages)}">
+			<a th:if="${currentPage != i}" th:href="@{'/users/page/' + ${i} + '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir}}">[[${i}]]</a>
+			<span th:unless="${currentPage != i}">[[${i}]]</span>
+			&nbsp;
+		</span>
+
+        <a th:if="${currentPage < totalPages}" th:href="@{'/users/page/' + ${currentPage + 1} + '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir}}">Next</a>
+        <span th:unless="${currentPage < totalPages}">Next</span>
+        &nbsp;&nbsp;
+
+        <a th:if="${currentPage < totalPages}" th:href="@{'/users/page/' + ${totalPages} + '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir}}">Last</a>
+        <span th:unless="${currentPage < totalPages}">Last</span>
+    </div>
+</div>
+<a href="/books">Show all books</a>
+<a href="/authors">Show all authors</a>
+</body>
+</html>

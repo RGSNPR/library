@@ -6,30 +6,30 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import ru.lofty.library.model.Author;
-import ru.lofty.library.repository.AuthorRepository;
+import ru.lofty.library.model.User;
+import ru.lofty.library.repository.UserRepository;
 
 /**
  * @author Alex Lavrentyev
  */
 
 @Service
-public class AuthorDao {
+public class UserDao {
 
-    AuthorRepository authorRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public AuthorDao(AuthorRepository authorRepository) {
-        this.authorRepository = authorRepository;
+    public UserDao(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
-    public boolean create(Author author) {
-        authorRepository.save(author);
+    public boolean create(User user) {
+        userRepository.save(user);
 
         return true;
     }
 
-    public Page<Author> readAll(int pageNumber, String sortField, String sortDir) {
+    public Page<User> readAll(int pageNumber, String sortField, String sortDir) {
 
         int pageSize = 3;
 
@@ -38,17 +38,17 @@ public class AuthorDao {
                         : Sort.by(sortField).descending()
         );
 
-        return authorRepository.findAll(pageable);
+        return userRepository.findAll(pageable);
     }
 
-    public Author read(Long id) {
-        return authorRepository.getById(id);
+    public User read(Long id) {
+        return userRepository.getById(id);
     }
 
-    public boolean update(Author author, Long id) {
-        if (authorRepository.existsById(id)) {
-            author.setId(id);
-            authorRepository.save(author);
+    public boolean update(User user, Long id) {
+        if (userRepository.existsById(id)) {
+            user.setId(id);
+            userRepository.save(user);
             return true;
         }
 
@@ -56,8 +56,8 @@ public class AuthorDao {
     }
 
     public boolean delete(Long id) {
-        if (authorRepository.existsById(id)) {
-            authorRepository.deleteById(id);
+        if (userRepository.existsById(id)) {
+            userRepository.deleteById(id);
             return true;
         }
 

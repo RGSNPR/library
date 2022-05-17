@@ -1,8 +1,6 @@
 package ru.lofty.library.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Getter;
-import lombok.Setter;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
@@ -13,8 +11,6 @@ import java.io.Serializable;
  * @author Alex Lavrentyev
  */
 
-@Getter
-@Setter
 @Entity
 @Table(name = "books")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
@@ -32,4 +28,35 @@ public class Book implements Serializable {
     @NotFound(action = NotFoundAction.IGNORE)
     private Author author;
 
+    public Long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getPublicationYear() {
+        return publicationYear;
+    }
+
+    public Author getAuthor() {
+        return author;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setPublicationYear(int publicationYear) {
+        this.publicationYear = publicationYear;
+    }
+
+    public void setAuthor(Author author) {
+        this.author = author;
+    }
 }
